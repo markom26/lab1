@@ -29,7 +29,22 @@ END clk_counter;
 
 ARCHITECTURE rtl OF clk_counter IS
 
+component reg is
+	generic(
+		WIDTH    : positive := 26;
+		RST_INIT : integer := 0
+	);
+	port(
+		i_clk  : in  std_logic;
+		in_rst : in  std_logic;
+		i_d    : in  std_logic_vector(WIDTH-1 downto 0);
+		o_q    : out std_logic_vector(WIDTH-1 downto 0)
+	);
+end component;
+
 SIGNAL   counter_r : STD_LOGIC_VECTOR(25 DOWNTO 0);
+SIGNAL   reg_next : STD_LOGIC_VECTOR(25 DOWNTO 0);
+
 
 BEGIN
 
@@ -38,4 +53,24 @@ BEGIN
 -- predstavlja jednu proteklu sekundu, brojac se nulira nakon toga
 
 
+	reg1 : reg 
+	generic map(
+		WIDTH => 26)
+	port map(
+
+	 i_clk => clk_i,
+	 in_rst => rst_i,
+	 i_d => reg_next,
+	 o_q => counter_r
+   );	
+	
+	reg_next <= counter_r + 1 when (cnt_en_i = '1' and counter_r < max_cnt) 
+					else (others => '0') when (cnt_en_i = '1' and counter_r = max_cnt)
+					else (others => '0') when (cnt_rst_i = '1')
+					else counter_r;
+	
+	--one_sec_o <= '1' when (reg_next = max_cnt) else '0';
+	one_sec_o <= '1' when (counter_r = max_cnt-1) else '0';
+	
+	
 END rtl;

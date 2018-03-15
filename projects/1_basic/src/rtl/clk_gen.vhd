@@ -100,7 +100,8 @@ dff: FD PORT MAP (
 
 clk_50MHz_o <= clk_div_s;
 
-reset_o    <= NOT dff_out_r;
+--reset_o    <= NOT dff_out_r;
+reset_o    <= dff_out_r;
 
 END rtl;
 
